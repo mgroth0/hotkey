@@ -1,6 +1,6 @@
 package matt.hotkey
 
-import matt.klibexport.klibexport.DSL
+import matt.klib.obj.DSL
 
 
 abstract class HotkeyDSL<H: Hotkey>: DSL {
