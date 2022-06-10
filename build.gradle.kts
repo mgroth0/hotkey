@@ -1,5 +1,6 @@
 modtype = LIB
 
 dependencies {
-	implementation(projects.kj.kjlib)
+  projectOrLocalMavenJVM("api", ":k:klib")
+//	implementation(projects.kj.kjlib)
 }
