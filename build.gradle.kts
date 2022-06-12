@@ -1,7 +1,7 @@
 modtype = LIB
 
 apis(
-  project(":k:klib")
+  project(":k:klib").jvm()
 )
 
 //dependencies {
