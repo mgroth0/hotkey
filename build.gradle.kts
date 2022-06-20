@@ -6,5 +6,5 @@ apis(
 
 //dependencies {
 //  projectOrLocalMavenJVM("api", )
-//	implementation(projects.kj.kjlib)
+//	implementation(projects.k.kjlib)
 //}
