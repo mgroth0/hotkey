@@ -5,7 +5,7 @@
   "dependencies": [
     {
       "type": "Project",
-      "cfg": "commonMainApi",
+      "cfg": "jsMainApi",
       "path": ":k:lang"
     },
     {
