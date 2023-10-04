@@ -3,7 +3,7 @@ package matt.hotkey.test
 
 import matt.hotkey.Hotkey
 import matt.hotkey.HotkeyDSL
-import matt.test.JupiterTestAssertions.assertRunsInOneMinute
+import matt.test.assertions.JupiterTestAssertions.assertRunsInOneMinute
 import kotlin.test.Test
 
 class HotkeyTests() {
