@@ -1,7 +1,10 @@
 package matt.hotkey
 
 import matt.collect.mapToSet
+import matt.hotkey.ConsumeInstruction.Consume
+import matt.hotkey.ConsumeInstruction.DoNotConsume
 import matt.lang.function.Dsl
+import matt.lang.function.Op
 import matt.lang.function.Produce
 import matt.lang.setall.setAll
 
@@ -46,7 +49,6 @@ open class HotkeyDsl {
     val Z get() = Key.Z
 
 
-    //    val ENTER get() = Key.ENTER
     val ESCAPE get() = Key.ESCAPE
     val BACK_SPACE get() = Key.BACK_SPACE
     val RETURN get() = Key.RETURN
@@ -94,20 +96,34 @@ open class HotkeyDsl {
     infix fun KeyStroke.ctrl(h: () -> Unit) = ctrl op { h() }
     infix fun KeyStroke.shift(h: () -> Unit) = shift op { h() }
 
-    infix fun KeyStroke.op(setOp: () -> Unit) = Hotkey(
-        keyStroke = this, handler = {
-            setOp()
-            ConsumeInstruction.Consume
+    infix fun KeyStroke.op(setOp: () -> Unit) =
+        Hotkey(
+            keyStroke = this, handler = {
+                setOp()
+                ConsumeInstruction.Consume
+            }
+        ).apply {
+            mHotkeys.add(this)
         }
-    ).apply {
-        mHotkeys.add(this)
+
+    fun KeyStroke.conditionalConsumption(
+        condition: () -> Boolean,
+        op: Op
+    ) {
+        this conditionalOp {
+            if (condition()) {
+                op()
+                Consume
+            } else DoNotConsume
+        }
     }
 
-    infix fun KeyStroke.conditionalOp(handler: () -> ConsumeInstruction) = Hotkey(
-        keyStroke = this, handler = handler
-    ).apply {
-        mHotkeys.add(this)
-    }
+    infix fun KeyStroke.conditionalOp(handler: () -> ConsumeInstruction) =
+        Hotkey(
+            keyStroke = this, handler = handler
+        ).apply {
+            mHotkeys.add(this)
+        }
 
     val KeyStroke.meta get() = copy(isMeta = true)
     val KeyStroke.opt get() = copy(isOpt = true)
@@ -131,24 +147,24 @@ open class HotkeyDsl {
     val KeyStrokeSet.ctrl get() = copy(keyStrokes = keyStrokes.mapToSet { it.ctrl })
     val KeyStrokeSet.shift get() = copy(keyStrokes = keyStrokes.mapToSet { it.shift })
 
-    fun digit(number: Int) = when (number) {
-        0 -> Key.DIGIT_0
-        1 -> Key.DIGIT_1
-        2 -> Key.DIGIT_2
-        3 -> Key.DIGIT_3
-        4 -> Key.DIGIT_4
-        5 -> Key.DIGIT_5
-        6 -> Key.DIGIT_6
-        7 -> Key.DIGIT_7
-        8 -> Key.DIGIT_8
-        9 -> Key.DIGIT_9
-        else -> error("no digit key for $number")
-    }
+    fun digit(number: Int) =
+        when (number) {
+            0 -> Key.DIGIT_0
+            1 -> Key.DIGIT_1
+            2 -> Key.DIGIT_2
+            3 -> Key.DIGIT_3
+            4 -> Key.DIGIT_4
+            5 -> Key.DIGIT_5
+            6 -> Key.DIGIT_6
+            7 -> Key.DIGIT_7
+            8 -> Key.DIGIT_8
+            9 -> Key.DIGIT_9
+            else -> error("no digit key for $number")
+        }
 
     fun decorateAllOps(decorator: (Produce<ConsumeInstruction>) -> ConsumeInstruction) {
         mHotkeys.setAll(mHotkeys.map { it.copy(handler = { decorator(it.handler) }) })
     }
-
 }
 
 
@@ -156,6 +172,9 @@ enum class ConsumeInstruction {
     Consume, DoNotConsume
 }
 
+
+/*Use Plural type-aliases like this all over! Such a good idea for concisely representing the preferred collection type for a type!!!*/
+typealias Hotkeys = List<Hotkey>
 data class Hotkey(
     val keyStroke: KeyStroke,
     val handler: Produce<ConsumeInstruction> /*todo: rename to 'action'?*/
@@ -185,7 +204,7 @@ data class KeyStroke(
     override val isMeta: Boolean = false,
     override val isOpt: Boolean = false,
     override val isCtrl: Boolean = false,
-    override val isShift: Boolean = false,
+    override val isShift: Boolean = false
 ) : KeyStrokeProps
 
 
@@ -217,6 +236,4 @@ enum class Key {
     val shift get() = KeyStroke(this, isShift = true)
     val opt get() = KeyStroke(this, isOpt = true)
     val meta get() = KeyStroke(this, isMeta = true)
-
-
 }

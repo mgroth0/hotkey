@@ -1,4 +1,4 @@
-package matt.hotkey
+package matt.hotkey.js
 
 import matt.lang.anno.SeeURL
 import org.w3c.dom.events.KeyboardEvent
